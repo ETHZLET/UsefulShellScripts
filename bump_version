@@ -1,0 +1,8 @@
+#!/bin/sh
+if [ -f $1 ]
+then
+cp $1 $1".bak"
+cat $1 | grep -v "\$plugin->version" > /tmp/version
+echo "\$plugin->version = `date +%Y%m%d%H`;" >> /tmp/version
+cp /tmp/version $1
+fi

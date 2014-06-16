@@ -1,0 +1,28 @@
+#!/bin/sh
+REAL_PHP_INI='/etc/php5/fpm/conf.d/20-xdebug.ini'
+REAL_PHP_INI_BACK="$HOME/backups/ext-xdebug.ini-`date +%F__%H-%M-%S`"
+TEMP_PHP_INI='/tmp/ext-xdebug.ini_flag'
+APACHE_CTL_RESTART='sudo /etc/init.d/php5-fpm restart'
+APACHE_CTL_RESTART2='sudo service nginx restart'
+
+if [ -f $TEMP_PHP_INI ];
+then
+# The file exists, so we should turn debugging OFF
+echo "Turning x-debugging OFF."
+cp -a $REAL_PHP_INI $REAL_PHP_INI_BACK
+cat $REAL_PHP_INI | grep -v xdebug.remote_autostart > $TEMP_PHP_INI
+echo "xdebug.remote_autostart=0" >> $TEMP_PHP_INI
+sudo cp $TEMP_PHP_INI $REAL_PHP_INI
+$APACHE_CTL_RESTART
+$APACHE_CTL_RESTART2
+rm $TEMP_PHP_INI
+else
+echo "Turning x-debugging ON."
+cp -a $REAL_PHP_INI $REAL_PHP_INI_BACK
+cat $REAL_PHP_INI | grep -v xdebug.remote_autostart > $TEMP_PHP_INI
+echo "xdebug.remote_autostart=1" >> $TEMP_PHP_INI
+sudo cp $TEMP_PHP_INI $REAL_PHP_INI
+$APACHE_CTL_RESTART
+$APACHE_CTL_RESTART2
+fi
+
